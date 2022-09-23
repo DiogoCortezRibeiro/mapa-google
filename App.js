@@ -4,14 +4,15 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, enableLatestRenderer, Marker } from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
+import MapViewDirections from 'react-native-maps-directions';
 
 enableLatestRenderer();
 
 const styles = StyleSheet.create({
  container: {
    ...StyleSheet.absoluteFillObject,
-   height: 400,
-   width: 400,
+   height: '100%',
+   width: '100%',
    justifyContent: 'flex-end',
    alignItems: 'center',
  },
@@ -239,6 +240,8 @@ const mapStyle = [
 export default function App () {
   const[origin, setOrigin] = useState(null);
   const[destino, setDestino]= useState(null);
+  const[marker, setMarker] = useState([]);
+  const mapEl = useRef(null);
 
   useEffect(() => {
     (async function() {
@@ -249,26 +252,49 @@ export default function App () {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-        setOrigin({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        })
+        setOrigin([location.coords])
       
     })();
-  }, [])
+  }, []);
 
+  /*const handleNewMarker = (cordenadas) => {
+    setMarker([...marker, cordenadas]);
+    {marker.length > 0 && (
+          marker.map((m, index) => {
+            return (
+              <Marker 
+              key={index}
+                coordinate={m}
+              />
+            )
+          })
+        )}
+  }*/
 
    return (
     <View style={styles.container}>
       <MapView
+        onPress={(e) => setDestino(e.nativeEvent.coordinate)}
         provider={PROVIDER_GOOGLE} // remove if not using Google Maps
         style={styles.map}
         initialRegion={origin}
         showsUserLocation={true}
         customMapStyle={mapStyle}
       >
+        {destino && 
+          <MapViewDirections
+            origin={origin}
+            destination={destino}
+            apikey="AIzaSyDtVn8gWm4lmZkrJfOXRCjtcOjHCAZxnBA"
+            strokeWidth={3}
+            onReady={result => {
+              console.log(result)
+             
+            }}
+          /> 
+        }
+       
+        
       </MapView>
     </View>
    )
