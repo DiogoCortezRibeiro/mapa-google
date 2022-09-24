@@ -1,9 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, enableLatestRenderer, Marker } from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
 import MapViewDirections from 'react-native-maps-directions';
 
 enableLatestRenderer();
@@ -252,36 +250,17 @@ export default function App () {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-        setOrigin([location.coords])
+      setOrigin([location.coords])
       
     })();
   }, []);
 
-  /*const handleNewMarker = (cordenadas) => {
+  const handleNewMarker = (cordenadas) => {
     setMarker([...marker, cordenadas]);
-    {marker.length > 0 && (
-          marker.map((m, index) => {
-            return (
-              <Marker 
-              key={index}
-                coordinate={m}
-              />
-            )
-          })
-        )}
-  }*/
+  }
 
-   return (
-    <View style={styles.container}>
-      <MapView
-        onPress={(e) => setDestino(e.nativeEvent.coordinate)}
-        provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-        style={styles.map}
-        initialRegion={origin}
-        showsUserLocation={true}
-        customMapStyle={mapStyle}
-      >
-        {destino && 
+  /* MapViewDirections
+    {destino && 
           <MapViewDirections
             origin={origin}
             destination={destino}
@@ -292,9 +271,36 @@ export default function App () {
              
             }}
           /> 
-        }
-       
-        
+    }
+  */
+
+   return (
+    <View style={styles.container}>
+      <MapView
+        onPress={(e) => handleNewMarker(e.nativeEvent.coordinate)}
+        provider={PROVIDER_GOOGLE} 
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+        showsUserLocation={true}
+        customMapStyle={mapStyle}
+      >
+      
+        {marker.length > 0 && (
+          marker.map((m, index) => {
+            return (
+              <Marker 
+              key={index}
+                coordinate={m}
+              />
+            )
+          })
+        )}
+
       </MapView>
     </View>
    )
